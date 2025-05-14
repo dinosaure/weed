@@ -1,0 +1,3 @@
+[submodule "miou-solo5"]
+	path = miou-solo5
+	url = git@git.robur.coop:robur/miou-solo5.git

@@ -1,0 +1,33 @@
+(executable
+ (name unikernel)
+ (modules unikernel)
+ (modes native)
+ (link_flags :standard -linkall -cclib "-z solo5-abi=hvt")
+ (libraries miou-solo5)
+ (foreign_stubs
+  (language c)
+  (names manifest.unikernel)))
+
+(rule
+ (targets manifest.unikernel.c)
+ (deps unikernel.json)
+ (enabled_if
+  (= %{context_name} "solo5"))
+ (action
+  (run solo5-elftool gen-manifest unikernel.json manifest.unikernel.c)))
+
+(rule
+ (targets unikernel.json)
+ (enabled_if
+  (= %{context_name} "solo5"))
+ (action
+  (with-stdout-to
+   unikernel.json
+   (run %{exe:unikernel.exe} --ipv4=0.0.0.0/32))))
+
+(rule
+ (targets manifest.unikernel.c)
+ (enabled_if
+  (= %{context_name} "default"))
+ (action
+  (write-file manifest.unikernel.c "")))
