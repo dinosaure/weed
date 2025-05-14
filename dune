@@ -3,7 +3,7 @@
  (modules unikernel)
  (modes native)
  (link_flags :standard -linkall -cclib "-z solo5-abi=hvt")
- (libraries miou-solo5)
+ (libraries owi miou-solo5)
  (foreign_stubs
   (language c)
   (names manifest.unikernel)))

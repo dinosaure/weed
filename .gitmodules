@@ -1,3 +1,9 @@
 [submodule "miou-solo5"]
 	path = miou-solo5
-	url = git@git.robur.coop:robur/miou-solo5.git
+	url = https://git.robur.coop/robur/miou-solo5.git
+[submodule "owi"]
+	path = owi
+	url = https://github.com/zapashcanon/owi.git
+[submodule "digestif"]
+	path = digestif
+	url = https://github.com/mirage/digestif.git
