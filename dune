@@ -3,7 +3,7 @@
  (modules unikernel)
  (modes native)
  (link_flags :standard -linkall -cclib "-z solo5-abi=hvt")
- (libraries owi miou-solo5)
+ (libraries hxd.core hxd.string digestif.c logs.fmt logs.cli fmt.cli owi bstr miou-solo5)
  (foreign_stubs
   (language c)
   (names manifest.unikernel)))
@@ -23,7 +23,7 @@
  (action
   (with-stdout-to
    unikernel.json
-   (run %{exe:unikernel.exe} --ipv4=0.0.0.0/32))))
+   (run %{exe:unikernel.exe} --size=0))))
 
 (rule
  (targets manifest.unikernel.c)
