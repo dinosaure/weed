@@ -7,3 +7,6 @@
 [submodule "digestif"]
 	path = digestif
 	url = https://github.com/mirage/digestif.git
+[submodule "mirage-crypto"]
+	path = mirage-crypto
+	url = "https://github.com/dinosaure/mirage-crypto.git#miou-solo5"
