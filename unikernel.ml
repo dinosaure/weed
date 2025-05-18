@@ -18,6 +18,23 @@ let load_func_from_module ls mod_id f_name =
   | None -> Error (`Unbound_name f_name)
   | Some v -> Ok (v, env_id)
 
+let load_memory_from_module ls mod_id name =
+  let* exports, env_id =
+    match mod_id with
+    | None -> begin
+      match ls.Link.last with
+      | None -> Error `Unbound_last_module
+      | Some m -> Ok m
+    end
+    | Some mod_id -> (
+      match Link.StringMap.find_opt mod_id ls.Link.by_id with
+      | None -> Error (`Unbound_module mod_id)
+      | Some exports -> Ok exports )
+  in
+  match Link.StringMap.find_opt name exports.memories with
+  | None -> Error (`Unbound_name name)
+  | Some v -> Ok (v, env_id)
+
 let block_device_to_string size blk =
   let pagesize = Miou_solo5.Block.pagesize blk in
   let size_aligned = (size + pagesize - 1) / pagesize * pagesize in
@@ -40,11 +57,28 @@ let run_modul ~size blk =
   in
   let* m, link_state = Link.modul link_state ~name:None m in
   let* () = Interpret.Concrete.modul link_state.envs m in
-  let* f, env_id = load_func_from_module link_state None "sqlite3_open" in
-  Interpret.Concrete.exec_vfunc_from_outside ~locals:[ V.I32 0l; I32 0l ] ~env:env_id
-    ~envs:link_state.envs f
+  let* malloc, env = load_func_from_module link_state None "malloc" in
+  let[@warning "-8"] Ok [ V.I32 path_addr ] = Interpret.Concrete.exec_vfunc_from_outside ~locals:[ V.I32 8l (* "file:db\000" *) ] ~env:env
+    ~envs:link_state.envs malloc in
+  let[@warning "-8"] Ok [ V.I32 sqlite_addr ] = Interpret.Concrete.exec_vfunc_from_outside ~locals:[ V.I32 8l ] ~env:env
+    ~envs:link_state.envs malloc in
+  let* memory, _env = load_memory_from_module link_state None "my_memory" in
+  ignore (Concrete_memory.blit_string memory "file:db\000" ~src:0l ~dst:path_addr ~len:8l);
+  let* ptr = Concrete_memory.load_64 memory sqlite_addr in
+  Fmt.epr ">>> %Lx\n%!" ptr;
+  let* sqlite3_open, env = load_func_from_module link_state None "sqlite3_open" in
+  let[@warning "-8"] Ok [ V.I32 _res ] = Interpret.Concrete.exec_vfunc_from_outside ~locals:[ V.I32 path_addr; I32 sqlite_addr ] ~env:env
+    ~envs:link_state.envs sqlite3_open in
+  (* struct sqlite3 *v;
+     sqlite3_open(..., &v); *)
+  let* ptr = Concrete_memory.load_64 memory sqlite_addr in
+  Fmt.epr ">>> %Lx\n%!" ptr; Ok ()
 
 let run _ size = Miou_solo5.(run [ block "wasm" ]) @@ fun blk () ->
+  let rng = Mirage_crypto_rng_miou_solo5.initialize (module Mirage_crypto_rng.Fortuna) in
+  let finally () =
+    Mirage_crypto_rng_miou_solo5.kill rng in
+  Fun.protect ~finally @@ fun () ->
   let result = run_modul ~size blk in
   match result with
   | Error e ->

@@ -1,9 +1,10 @@
 (executable
  (name unikernel)
- (modules unikernel)
+ (modules unikernel concrete_wasm_ffi)
  (modes native)
  (link_flags :standard -linkall -cclib "-z solo5-abi=hvt")
- (libraries hxd.core hxd.string digestif.c logs.fmt logs.cli fmt.cli owi bstr miou-solo5)
+ (libraries hxd.core hxd.string digestif.c logs.fmt logs.cli fmt.cli owi bstr miou-solo5
+  mirage-crypto-rng-miou-solo5)
  (foreign_stubs
   (language c)
   (names manifest.unikernel)))
