@@ -1,6 +1,6 @@
 [submodule "miou-solo5"]
 	path = miou-solo5
-	branch = "weed"
+	branch = weed
 	url = https://git.robur.coop/robur/miou-solo5.git
 [submodule "owi"]
 	path = owi
@@ -10,8 +10,8 @@
 	url = https://github.com/mirage/digestif.git
 [submodule "mirage-crypto"]
 	path = mirage-crypto
-	branch = "miou-solo5"
-	url = "https://github.com/dinosaure/mirage-crypto.git"
+	branch = miou-solo5
+	url = https://github.com/dinosaure/mirage-crypto.git
 [submodule "bstr"]
 	path = bstr
 	url = https://github.com/robur-coop/bstr.git
