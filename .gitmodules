@@ -10,3 +10,6 @@
 [submodule "mirage-crypto"]
 	path = mirage-crypto
 	url = "https://github.com/dinosaure/mirage-crypto.git#miou-solo5"
+[submodule "bstr"]
+	path = bstr
+	url = https://github.com/robur-coop/bstr.git
