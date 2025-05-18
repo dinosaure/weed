@@ -1,5 +1,6 @@
 [submodule "miou-solo5"]
 	path = miou-solo5
+	branch = "weed"
 	url = https://git.robur.coop/robur/miou-solo5.git
 [submodule "owi"]
 	path = owi
